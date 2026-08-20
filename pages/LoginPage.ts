@@ -4,7 +4,11 @@ export class LoginPage {
   constructor(private readonly page: Page) {}
 
   async goto(): Promise<void> {
-    await this.page.goto('/web/index.php/auth/login');
+    // Wait only for DOMContentLoaded rather than the full "load" event:
+    // the live demo site keeps background network activity going
+    // (trackers/widgets), which can delay "load" past the default 30s
+    // navigation timeout even though the login form is already usable.
+    await this.page.goto('/web/index.php/auth/login', { waitUntil: 'domcontentloaded', timeout: 45000 });
   }
 
   async login(username: string, password: string): Promise<void> {
