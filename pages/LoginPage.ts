@@ -14,6 +14,9 @@ export class LoginPage {
   }
 
   async assertLoggedIn(): Promise<void> {
-    await expect(this.page).toHaveURL(/dashboard\/index/);
+    // The shared public demo instance can be slow to redirect after login;
+    // the default 5s expect timeout is occasionally too tight and produces
+    // a flaky failure (page.url() still "" when the assertion polls).
+    await expect(this.page).toHaveURL(/dashboard\/index/, { timeout: 15000 });
   }
 }
