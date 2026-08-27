@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 export const logger = {
   info(message: string): void {
     console.log(`[INFO] ${message}`);

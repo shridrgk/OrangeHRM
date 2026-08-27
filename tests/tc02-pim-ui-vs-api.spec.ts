@@ -11,16 +11,6 @@ function apiFullFirstName(record: EmployeeApiRecord): string {
   return normalize(`${record.firstName} ${record.middleName ?? ''}`);
 }
 
-// The UI grid appends a " (Deleted)" suffix to a Job Title when the
-// underlying job-title/designation record has since been deleted from the
-// system, even though the employee's own record still references the old
-// title text. The API returns only the bare title with no such suffix, so
-// it must be stripped before comparing - this is expected app behavior, not
-// a data mismatch.
-function normalizeJobTitle(value: string | undefined | null): string {
-  return normalize(value).replace(/\s*\(Deleted\)\s*$/i, '');
-}
-
 interface FieldComparison {
   field: string;
   uiValue: string;
@@ -64,7 +54,7 @@ function compareEmployee(uiRow: EmployeeUiRow, apiRecord: EmployeeApiRecord): Em
       field: 'Job Title',
       uiValue: normalize(uiRow.jobTitle),
       apiValue: normalize(apiRecord.jobTitle?.title),
-      match: normalizeJobTitle(uiRow.jobTitle) === normalizeJobTitle(apiRecord.jobTitle?.title),
+      match: normalize(uiRow.jobTitle) === normalize(apiRecord.jobTitle?.title),
     });
   }
 
@@ -165,7 +155,9 @@ test.describe('TC02 - PIM employee grid vs employee-search API reconciliation', 
       logger.error(`Employee data mismatch detected for ${mismatches.length} employee(s):`);
       for (const mismatch of mismatches) {
         for (const field of mismatch.fields.filter((f) => !f.match)) {
-          logger.error(`  [${mismatch.identifier}] ${field.field} -> UI: "${field.uiValue}" | API: "${field.apiValue}"`);
+          logger.error(
+            `  [${mismatch.identifier}] ${field.field} -> UI: "${field.uiValue}" | API: "${field.apiValue}"`
+          );
         }
       }
     }
